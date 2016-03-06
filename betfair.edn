@@ -1,0 +1,7 @@
+{:betfair {:login-url "https://identitysso.betfair.com/api/login"
+           :logout-url "https://identitysso.betfair.com/api/logout"
+           :keep-alive-url "https://identitysso.betfair.com/api/keepAlive"
+           :keep-alive-period 10800 ;;secounds for 3 hours
+           :betting-api "https://api.betfair.com/exchange/betting/rest/v1.0/"
+           :accout-api "https://api.betfair.com/exchange/account/rest/v1.0/"
+           }}

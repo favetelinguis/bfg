@@ -6,6 +6,27 @@ window.onload = function() {
   var messages = document.getElementById('messages');
 
   var socket;
+  var uri = "ws://" + location.host + location.pathname;
+  uri = uri.substring(0, uri.lastIndexOf('/'));
+  socket = new WebSocket(uri);
+
+  socket.onerror = function(error) {
+    output("error", error);
+  };
+
+  socket.onopen = function(event) {
+    output("opened", "Connected to " + event.currentTarget.url);
+  };
+
+  socket.onmessage = function(event) {
+    var message = JSON.parse(event.data);
+    output("received", "<<< " + JSON.stringify(message.msg));
+  };
+
+  socket.onclose = function(event) {
+    output("closed", "Disconnected: " + event.code + " " + event.reason);
+    socket = undefined;
+  };
 
   function output(style, text){
     messages.innerHTML += "<br/><span class='" + style + "'>" + text + "</span>";
@@ -16,28 +37,6 @@ window.onload = function() {
       output("error", "Already connected");
       return;
     }
-
-    var uri = "ws://" + location.host + location.pathname;
-    uri = uri.substring(0, uri.lastIndexOf('/'));
-    socket = new WebSocket(uri);
-
-    socket.onerror = function(error) {
-      output("error", error);
-    };
-
-    socket.onopen = function(event) {
-      output("opened", "Connected to " + event.currentTarget.url);
-    };
-
-    socket.onmessage = function(event) {
-      var message = event.data;
-      output("received", "<<< " + message);
-    };
-
-    socket.onclose = function(event) {
-      output("closed", "Disconnected: " + event.code + " " + event.reason);
-      socket = undefined;
-    };
   };
   sendBtn.onclick = function(e) {
     if (socket == undefined) {
@@ -45,7 +44,8 @@ window.onload = function() {
       return;
     }
     var text = document.getElementById("input").value;
-    socket.send(text);
+    socket.send(JSON.stringify({type: "betting/listEventTypes",
+                                msg: text}));
     output("sent", ">>> " + text);
   };
   closeBtn.onclick = function(e) {
