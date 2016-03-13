@@ -1,7 +1,7 @@
 (defproject bfg "0.1.0-SNAPSHOT"
   :dependencies [[org.clojure/clojure "1.7.0"]
                  [org.immutant/web "2.1.2"]
-                 [compojure "1.1.8"]
+                 [compojure "1.5.0"]
                  [ring/ring-core "1.3.0"]
                  [environ "1.0.0"]
 
@@ -13,6 +13,7 @@
 
                  [levand/immuconf "0.1.0"]
                  ]
+  :plugins [[lein-exec "0.3.6"]]
   :main bfg.core
   :uberjar-name "bfg-standalone.jar"
   :profiles {:uberjar {:aot [bfg.core]}}

@@ -23,7 +23,7 @@
      name :- s/Str])
 
 (s/defrecord EventTypeResult
-    [event-type :- EventType
+    [eventType :- EventType
      name :- s/Str])
 
 (defn- send-betting-request!
@@ -31,10 +31,8 @@
   [token app-key payload endpoint]
   (let [return (promise)
         number (rand-int 20)]
-    (deliver return [(g/sample number EventTypeResult)])
+    (deliver return (g/sample number EventTypeResult))
     return))
 
 (defn list-event-types! [market-filter]
   (send-betting-request! "t" "ak" market-filter "listEventTypes"))
-
-(list-event-types! 1)
