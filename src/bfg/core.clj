@@ -3,7 +3,7 @@
    [bfg.ws :as ws]
    [ring.middleware.resource :refer (wrap-resource)]
    [ring.middleware.content-type :refer (wrap-content-type)]
-   [ring.middleware.not-modified :refer (wrap-not-modified)])
+   [ring.middleware.not-modified :refer (wrap-not-modified)]
    [immuconf.config :as immuconf]
    [immutant.web             :as web]
    [immutant.web.async       :as async]
