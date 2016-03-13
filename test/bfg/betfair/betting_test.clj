@@ -3,7 +3,7 @@
             [org.httpkit.fake :refer :all]
             [clojure.test :refer :all]))
 
-(deftest betting-api
+#_(deftest betting-api
   (testing "list-event-types!"
     (let [response "pong"]
       (is
