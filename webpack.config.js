@@ -1,31 +1,36 @@
 var webpack = require('webpack');
+var HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
-  entry: [
-    'webpack-dev-server/client?http://localhost:8080',
-    'webpack/hot/only-dev-server',
-    './jssrc/index.jsx'
-  ],
-  module: {
-    loaders: [{
-      test: /\.jsx?$/,
-      exclude: /node_modules/,
-      loader: 'react-hot!babel'
-    }]
-  },
-  resolve: {
-    extensions: ['', '.js', '.jsx']
-  },
+  devtool: 'eval-source-map',
+  entry: __dirname + "/jssrc/index.jsx",
   output: {
-    path: __dirname + '/resources/public/js',
-    publicPath: '/',
-    filename: 'bundle.js'
+    path: __dirname + "/resources/public",
+    filename: "bundle.js"
   },
-  devServer: {
-    contentBase: './resources/public',
-    hot: true
+
+  module: {
+    loaders: [
+      { test: /\.json$/, loader: "json" },
+      { test: /\.jsx?$/, exclude: /node_modules/, loader: 'babel' },
+      { test: /\.css$/, loader: 'style!css?modules!postcss' }
+    ]
   },
+  postcss: [
+    require('autoprefixer')
+  ],
+
   plugins: [
+    new HtmlWebpackPlugin({
+      template: __dirname + "/resources/index.tmpl.html"
+    }),
     new webpack.HotModuleReplacementPlugin()
-  ]
-};
+  ],
+
+  devServer: {
+    colors: true,
+    historyApiFallback: true,
+    inline: true,
+    hot: true
+  }
+}

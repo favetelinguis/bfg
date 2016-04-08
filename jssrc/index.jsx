@@ -5,13 +5,15 @@ import { createStore, applyMiddleware } from 'redux';
 import { Provider } from 'react-redux';
 
 import socket from './websocket';
-import reducer from './reducer';
+import reducer from './reducers/reducer';
 import remoteActionMiddleware from './remote_action_middleware';
 import App from './components/App.jsx';
 import InitSelector from './components/InitSelector.jsx';
 import { Selector1Container } from './components/Selector1.jsx';
 import Selector2 from './components/Selector2.jsx';
 
+/* import '../resources/style.css';
+ */
 const createStoreWithMiddleware = applyMiddleware(
   remoteActionMiddleware(socket)
 )(createStore);

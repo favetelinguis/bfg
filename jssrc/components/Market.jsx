@@ -5,7 +5,7 @@ export default React.createClass({
   render() {
     return (
       <Panel header="Market" >
-        <h1>Market content!</h1>
+        <h1>Market content!!!</h1>
       </Panel>
     )
   }
