@@ -3,18 +3,29 @@
                  [org.immutant/web "2.1.2"]
                  [compojure "1.5.0"]
                  [ring/ring-core "1.3.0"]
-                 [environ "1.0.0"]
+                 [environ "1.0.0"] ;; todo remove
 
                  [prismatic/schema "1.0.5"]
                  [org.clojure/test.check "0.9.0"]
-                 [http-kit "2.1.18"]
+                 [http-kit "2.1.19"]
                  [http-kit.fake "0.2.1"]
                  [cheshire "5.5.0"]
+                 [com.taoensso/timbre "4.1.4"]
 
+                 [com.stuartsierra/component "0.3.1"]
                  [levand/immuconf "0.1.0"]
+                 [clj-time "0.11.0"]
+                 [criterium "0.4.3"]
+                 [jarohen/chime "0.1.9"]
+                 [org.clojure/core.async "0.2.374"]
                  ]
-  :plugins [[lein-exec "0.3.6"]]
+
+  :repl-options {:init-ns user
+                 :welcome (println "Type (dev) to start")}
+
+  :profiles {:dev {:dependencies [[org.clojure/tools.namespace "0.2.11"]] ;;used for reload
+                   :source-paths ["dev"]}
+             :uberjar {:aot [bfg.core]}} ;; used for uberjar
   :main bfg.core
   :uberjar-name "bfg-standalone.jar"
-  :profiles {:uberjar {:aot [bfg.core]}}
   :min-lein-version "2.4.0")

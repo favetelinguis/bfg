@@ -4,8 +4,8 @@ function output(text){
 
 function setupSocket() {
   let socket;
-  // let uri = "ws://" + "localhost:5000" + location.pathname;
-  let uri = "ws://" + location.host + location.pathname;
+  let uri = "ws://" + "localhost:8085" + location.pathname;
+  // let uri = "ws://" + location.host + location.pathname;
   uri = uri.substring(0, uri.lastIndexOf('/'));
   socket = new WebSocket(uri);
 
