@@ -1,4 +1,4 @@
-import { combineReducers } from 'redux';
+import { combineReducers } from 'redux-immutable';
 
 import eventTypes from './eventTypes';
 import contries from './contries';

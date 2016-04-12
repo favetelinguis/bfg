@@ -38,7 +38,7 @@
                 ;; if we dont respond to x heartbeats we kill the go block??
                 (async/send! channel (c/generate-string
                                       {:event "action"
-                                       :payload {:type "SET_STATE"
+                                       :payload {:type "SET_EVENT_TYPES"
                                                  :state {
                                                          :eventTypes (->>
                                                                       @(betting/list-event-types! "bla")

@@ -1,3 +1,4 @@
+import { Map } from 'immutable';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Route, Router, IndexRoute, hashHistory } from 'react-router';
@@ -17,9 +18,10 @@ import Selector2 from './components/Selector2.jsx';
 const createStoreWithMiddleware = applyMiddleware(
   remoteActionMiddleware(socket)
 )(createStore);
+const initialState = Map();
 const store = createStoreWithMiddleware(
   reducer,
-  undefined,
+  initialState,
   window.devToolsExtension ? window.devToolsExtension() : f => f
 );
 

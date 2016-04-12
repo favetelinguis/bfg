@@ -7,7 +7,7 @@ export const setEventTypes = () => {
 
 export const setState = (state) => {
   return {
-    type: 'SET_STATE',
+    type: 'SET_EVENT_TYPES',
     state
   };
 };
