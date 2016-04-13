@@ -1,5 +1,6 @@
 (ns bfg.assembly
   (:require
+   [bfg.impl.betfair-client :as bfc]
    [taoensso.timbre :as timbre]
    [com.stuartsierra.component :as component]
    [clojure.core.async :as async]
@@ -7,9 +8,13 @@
    ))
 
 (defn dev-system [{:keys (betfair web-server) :as config}]
-  (let []
+  (let [market-book-feed (async/chan)
+        betfair-response (async/chan)
+        betfair-request (async/chan)]
     (-> (component/system-map
-         :web-server (new-web-server web-server))
+         :web-server (new-web-server web-server)
+         :betfair-client (bfc/new-betfair-client betfair market-book-feed betfair-request betfair-response)
+         )
         ;; (component/system-using
         ;;  {
         ;;   :trade-manager {:trader :trader

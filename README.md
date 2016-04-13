@@ -6,6 +6,11 @@ A Clojure library designed to ... well, that part is up to you.
 
 ## Usage
 
+A configuration file is required named configs/private.edn that has the following format:
+{:betfair {:usr "<user>"
+           :pwd "<password>"
+           :app-key "<app-key>"}}
+
 ###Server is implemented using the reloabable workflow of stuart sieera. To launch a dev server:
 1. Start a repl
 2. Type ```(dev)```
