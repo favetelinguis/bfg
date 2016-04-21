@@ -1,6 +1,6 @@
 import { combineReducers } from 'redux-immutable';
 
-import eventTypes from './eventTypes';
+import listEventTypes from './eventTypes';
 import contries from './contries';
 import venues from './venues';
 import marketTypes from './marketTypes';
@@ -9,7 +9,7 @@ import timeRanges from './timeRanges';
 import events from './events';
 
 export default combineReducers({
-  eventTypes,
+  listEventTypes,
   contries,
   venues,
   marketTypes,

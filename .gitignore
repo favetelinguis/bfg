@@ -13,3 +13,5 @@ node_modules
 .tern-port
 .#*
 configs/private.edn
+npm-debug.log
+rethinkdb_data

@@ -1,7 +1,8 @@
 export default socket => store => next => action => {
   if (action.meta && action.meta.remote) {
     // Add a line in the sent object called type: action
-    socket.emit('action', action);
+    const json = JSON.stringify(action);
+    socket.send(json);
   }
   // if we dont call next the action will not be sent to the
   // reducer but just to this middleware

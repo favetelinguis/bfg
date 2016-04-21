@@ -1,13 +1,9 @@
-export const setEventTypes = () => {
+// Set isLoading to true
+// Make sideeffect with server call
+// Needs to be async?
+export const getEventTypes = () => {
   return {
     meta: { remote: true },
-    type: 'SET_EVENTTYPE'
-  };
-};
-
-export const setState = (state) => {
-  return {
-    type: 'SET_EVENT_TYPES',
-    state
+    type: 'GET_EVENTTYPES'
   };
 };

@@ -21,20 +21,20 @@ const createStoreWithMiddleware = applyMiddleware(
 const initialState = Map();
 const store = createStoreWithMiddleware(
   reducer,
-  initialState,
+  initialState, //Nice place to get state from server to set client state up to date
   window.devToolsExtension ? window.devToolsExtension() : f => f
 );
 
-socket.registerEventHandler((dispatch, payload) => {
-  switch (dispatch) {
-    case 'action':
-      store.dispatch(payload);
-      break;
-    default:
-      console.warn(dispatch, payload);
-  }
-});
-
+/* socket.registerEventHandler((dispatch, payload) => {
+   switch (dispatch) {
+   case 'action':
+   store.dispatch(payload);
+   break;
+   default:
+   console.warn(dispatch, payload);
+   }
+   });
+ */
 const routes = (
   <Route path="/" component={ App }>
     <IndexRoute component={ InitSelector } />

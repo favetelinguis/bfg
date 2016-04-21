@@ -1,5 +1,6 @@
 (ns bfg.impl.betfair-client
   (:require
+   [bfg.betfair.api :as bf]
    [bfg.protocol :refer (trade-manager-dispatch-values
                                  betfair-client-dispatch-values BetfairClientMsg)]
    [taoensso.timbre :as timbre]
@@ -50,7 +51,7 @@
                            "X-Application" app-key}}]
     (http/request options)))
 
-(defn- send-request
+#_(defn- send-request
   [url token app-key msg response-ch]
   (let [{:keys (body endpoint)} msg
         options {:url (str url endpoint)
@@ -66,7 +67,7 @@
                                                   :msg response
                                                   })))))
 
-(defn- new-feed-request
+#_(defn- new-feed-request
   [url token app-key body]
   (let [options {:url url
                  :method :post
@@ -96,7 +97,7 @@
         (recur)))
     (fn stop-fn [] (a/close! timer-ch))))
 
-(defn- start-api
+#_(defn- start-api
   [betfair-request betfair-response market-book-feed token config]
   (let [betting-url (get-in config [:betting-api])
         account-url (get-in config [:account-api])
@@ -122,7 +123,7 @@
         (recur)))))
 
 (defrecord Betfair-client
-    [config running? token kill-keep-alive market-book-feed betfair-request betfair-response]
+    [config running? token kill-keep-alive out-chan]
   component/Lifecycle
   (start [component]
     (timbre/info "Starting betfair client")
@@ -143,7 +144,7 @@
             (if-not (= status "SUCCESS")
               (throw (Exception. (str "Login failed: " status "error:" error)))
               (do
-                (start-api betfair-request betfair-response market-book-feed token config)
+                ;; (start-api betfair-request betfair-response market-book-feed token config)
                 (assoc component
                        :running? true
                        :token token
@@ -165,16 +166,14 @@
             (if-not (= status "SUCCESS")
               (throw (Exception. (str "Logout failed:" status "error:" error)))
               (do
-                (a/close! betfair-response)
-                (a/close! market-book-feed)
+                ;; (a/close! betfair-response)
+                ;; (a/close! market-book-feed)
                 (assoc component
                        :running? false
                        :token nil
                        :kill-keep-alive (kill-keep-alive)))))))
       component)))
 
-(defn new-betfair-client [config market-book-feed betfair-request betfair-response]
+(defn new-betfair-client [config out-chan]
   (map->Betfair-client {:config config
-                        :market-book-feed market-book-feed
-                        :betfair-request betfair-request
-                        :betfair-response betfair-response}))
+                        :out-chan out-chan}))

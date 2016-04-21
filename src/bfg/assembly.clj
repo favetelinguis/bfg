@@ -1,27 +1,32 @@
 (ns bfg.assembly
   (:require
-   [bfg.impl.betfair-client :as bfc]
    [taoensso.timbre :as timbre]
    [com.stuartsierra.component :as component]
    [clojure.core.async :as async]
+   [bfg.impl.betfair-client :as bfc]
    [bfg.impl.web-server :refer (new-web-server)]
+   [bfg.impl.message-handler :refer (new-message-handler)]
+   [bfg.impl.db :refer (new-database)]
    ))
 
 (defn dev-system [{:keys (betfair web-server) :as config}]
-  (let [market-book-feed (async/chan)
-        betfair-response (async/chan)
-        betfair-request (async/chan)]
+  (let [ws-out-chan (async/chan)
+        db-out-chan (async/chan)
+        bf-out-chan (async/chan)
+        mh-in-chan (async/merge [ws-out-chan db-out-chan bf-out-chan] 1024)
+        ]
     (-> (component/system-map
-         :web-server (new-web-server web-server)
-         :betfair-client (bfc/new-betfair-client betfair market-book-feed betfair-request betfair-response)
+         :message-handler (new-message-handler mh-in-chan)
+         :web-server (new-web-server web-server ws-out-chan)
+         :betfair-client (bfc/new-betfair-client betfair bf-out-chan)
+         :db (new-database db-out-chan) ;;add config parameter for db
          )
-        ;; (component/system-using
-        ;;  {
-        ;;   :trade-manager {:trader :trader
-        ;;                   :betfair-client :betfair-client
-        ;;                   }
-        ;;   :web-server {:sente :sente}
-        ;;   })
+        (component/system-using
+         {
+          :message-handler {:ws :web-server
+                            :bf :betfair-client
+                            :db :db}
+          })
         )))
 
 ;;(prod-system)

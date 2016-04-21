@@ -1,73 +1,55 @@
 (ns bfg.impl.web-server
   (:require
-   [ring.middleware.resource :refer (wrap-resource)]
-   [ring.middleware.content-type :refer (wrap-content-type)]
-   [ring.middleware.not-modified :refer (wrap-not-modified)]
-   [immuconf.config :as immuconf]
    [immutant.web             :as web]
    [immutant.web.async       :as async]
    [immutant.web.middleware  :as web-middleware]
-   [environ.core             :refer (env)]
 
-   [bfg.betfair.betting :as betting]
    [compojure.route          :as route]
-   [compojure.core           :refer (rfn ANY GET routes)]
-   [cheshire.core :as c]
+   [compojure.core           :refer (ANY GET defroutes)]
    [ring.util.response       :refer (response redirect resource-response content-type)]
 
    [taoensso.timbre :as timbre]
    [com.stuartsierra.component :as component]
+
+   [bfg.message-handlers.ws-handler :as mh]
    ))
 
-;; Needs to return a string
-(defmulti message-handler :type)
+(defonce channels (atom #{}))
 
-(def setup-routes
-  (routes
-   (GET "/" []
-     (-> (resource-response "index.html" {:root "public"})
-         (content-type "text/html")))
-   (GET "/*" [] (redirect "/"))))
+(defn connect! [channel]
+  (timbre/info "WS channel open")
+  (swap! channels conj channel))
+
+(defn disconnect! [channel {:keys [code reason]}]
+  (timbre/info "WS channel closed")
+  (swap! channels #(remove #{channel} %)))
+
+(defn incoming-message! [channel message]
+  (timbre/info "WS incoming message: " message)
+  (mh/message-handler message))
+
+#_(defn send-response! [response]
+  (timbre/info "WS outgoing message: " response)
+      (doseq [channel @channels]
+        (async/send! channel (c/generate-string response))))
 
 (def websocket-callbacks
-  "WebSocket callback functions"
-  {:on-open   (fn [channel]
-                ;; start a go block and register a channel, how to handle
-                ;; when the same channel reconect during a heartbeat?
-                ;; we dont want on close to kill the go block and we loose all state
-                ;; if we dont respond to x heartbeats we kill the go block??
-                (async/send! channel (c/generate-string
-                                      {:event "action"
-                                       :payload {:type "SET_EVENT_TYPES"
-                                                 :state {
-                                                         :eventTypes (->>
-                                                                      @(betting/list-event-types! "bla")
-                                                                      (map #(assoc-in % [:eventType :id] (str (gensym "id")))))
-                                                         }}})))
+   {:on-open connect!
+    :on-close disconnect!
+    :on-message incoming-message!})
 
-   :on-close   (fn [channel {:keys [code reason]}]
-                 (println "close code:" code "reason:" reason))
-   :on-message (fn [ch m]
-                 (async/send! ch (c/generate-string
-                                  (message-handler
-                                   (c/parse-string m true)))))})
+(defroutes routes
+  (GET "/" {c :context} (redirect (str c "/index.html")))
+  (route/resources "/"))
 
-(defn handler [routes]
-  (-> routes
-      (wrap-resource "public")
-      (wrap-content-type)
-      (wrap-not-modified)
-      (web-middleware/wrap-session {:timeout 20})
-      ;; wrap the handler with websocket support
-      ;; websocket requests will go to the callbacks, ring requests to the handler
-      (web-middleware/wrap-websocket websocket-callbacks)))
-
-(defrecord WebServer [options server sente]
+(defrecord WebServer [options server out-chan]
   component/Lifecycle
   (start [component]
     (timbre/info "Starting web-server at port: " (get options :port))
-    (let [app (handler setup-routes)
-          server (web/run app options)]
+    (let [server (web/run (-> routes
+                              (web-middleware/wrap-session {:timeout 20})
+                              (web-middleware/wrap-websocket websocket-callbacks))
+                   options)]
       (assoc component
              :server server)))
   (stop [component]
@@ -77,11 +59,7 @@
       component)))
 
 (defn new-web-server
-  ([options]
+  ([options out-chan]
    (map->WebServer {:options {:host (or (get options :host) "0.0.0.0")
-                              :port (or (get options :port) 0)}})))
-
-(defmethod message-handler "betting/listEventTypes"
-  [{:keys (msg)}]
-  {:type "event-types"
-   :state {:eventTypes @(betting/list-event-types! "dont care")}})
+                              :port (or (get options :port) 0)}
+                    :out-chan out-chan})))
