@@ -1,42 +1,42 @@
 (ns bfg.impl.message-handler
   (:require
+   [clojure.core.async :as a]
    [taoensso.timbre :as timbre]
    [com.stuartsierra.component :as component]
-   [bfg.message-handlers.mh-handler :as mh]))
+   [bfg.message-handlers.mh-handler :as mh]
+   [clojure.core.async :as a]))
 
-#_(defn start-message-handler [in-ch db bf ws]
-  (let [
-        dep {:db db
-             :bf bf
-             :ws ws}])
-  ;; Login in go loop when message arrives
-  (timbre/info "Message handler recived message: " msg)
-  ;; start go-loop return close fn
-  ;; use (mh/message-handler msg dep)
-  )
+(defn start-message-handler! [in-chan component]
+  (let [kill-chan (a/chan)]
+    (a/go-loop []
+      (let [[msg ch] (a/alts! [kill-chan in-chan])]
+        (when-not (= ch kill-chan)
+          (do
+            (timbre/info (:type msg))
+            (mh/message-handler component msg)
+            (recur)))))
+    (fn stop! []
+      (a/put! kill-chan :stop))))
 
-(defrecord MessageHandler [running? stop-message-handler in-ch ws bf db]
+(defrecord MessageHandler [running? kill-fn! in-ch ws bf db]
   component/Lifecycle
   (start [component]
     (timbre/info "Starting Message handler")
     (if-not running?
-      (let [mh :n #_(start-message-handler in-ch db bf ws)
-            dep {:db db
-                 :bf bf
-                 :ws ws}
-      ;; Login in go loop when message arrives
-            kill-fn :start]
+      (let [stop-mh! (start-message-handler! in-ch component)]
         (assoc component
                :running? true
-               :stop-message-handler mh))
+               :kill-fn! stop-mh!))
       component))
 
   (stop [component]
     (timbre/info "Stopping Message handler")
     (if running?
-      (assoc component
-             :running? false
-             :stop-message-handler (stop-message-handler))
+      (do
+        (kill-fn!)
+        (assoc component
+               :running? false
+               :kill-fn! nil))
       component)))
 
 (defn new-message-handler [in-ch]

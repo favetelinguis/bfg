@@ -25,9 +25,11 @@
   (stop [component]
     (timbre/info "Closing database connection")
     (if running?
-      (assoc component
-             {:running? false
-              :conn (r/close conn)})
+      (do
+        (r/close conn)
+        (assoc component
+               :running? false
+                :conn nil))
       component)))
 
 (defn new-database [out-chan]

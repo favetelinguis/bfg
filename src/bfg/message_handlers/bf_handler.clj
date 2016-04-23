@@ -1,8 +1,12 @@
-(ns bfg.message-handlers.bf-handler)
+(ns bfg.message-handlers.bf-handler
+  (:require
+   [taoensso.timbre :as timbre]
+   ))
 
 (defmulti message-handler
   "Message handler for db calls"
-  (fn [ _ {:keys [dispatch]}] (first dispatch)))
+  (fn [ _ msg] (:type msg)))
 
-(defmethod message-handler :list-event-types list-event-types [betfair message]
-  1)
+(defmethod message-handler "GET_EVENTTYPES" get-eventtypes
+  [bf msg]
+  (timbre/info (:type msg)))

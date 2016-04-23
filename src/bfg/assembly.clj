@@ -2,7 +2,7 @@
   (:require
    [taoensso.timbre :as timbre]
    [com.stuartsierra.component :as component]
-   [clojure.core.async :as async]
+   [clojure.core.async :as a]
    [bfg.impl.betfair-client :as bfc]
    [bfg.impl.web-server :refer (new-web-server)]
    [bfg.impl.message-handler :refer (new-message-handler)]
@@ -10,10 +10,10 @@
    ))
 
 (defn dev-system [{:keys (betfair web-server) :as config}]
-  (let [ws-out-chan (async/chan)
-        db-out-chan (async/chan)
-        bf-out-chan (async/chan)
-        mh-in-chan (async/merge [ws-out-chan db-out-chan bf-out-chan] 1024)
+  (let [ws-out-chan (a/chan)
+        db-out-chan (a/chan)
+        bf-out-chan (a/chan)
+        mh-in-chan (a/merge [ws-out-chan db-out-chan bf-out-chan] 1024)
         ]
     (-> (component/system-map
          :message-handler (new-message-handler mh-in-chan)
