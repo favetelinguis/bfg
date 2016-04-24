@@ -4,6 +4,8 @@
    [clojure.tools.namespace.repl :refer (refresh refresh-all)]
    [immuconf.config :as immuconf]
    [com.stuartsierra.component :as component]
+   [taoensso.timbre :as timbre]
+   [taoensso.timbre.appenders.core :as appenders]
    ;; Misc stuff used in repl for testing etc
    [clojure.core.async :as a :refer (put!)]
    [taoensso.timbre :as timbre]
@@ -47,3 +49,7 @@
 (defn reset []
   (stop)
   (refresh :after 'dev/go))
+
+;; SETUP CONFIG need to be done in some other place to work in prod also
+(timbre/merge-config! {:appenders {:spit (appenders/spit-appender {:fname "./bfg.log"})}})
+(timbre/merge-config! {:appenders {:println {:enabled? false}}})

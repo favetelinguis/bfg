@@ -12,15 +12,10 @@
    :keepalive 30000
    })
 
-(defmulti message-handler
-  "Message handler for db calls"
-  (fn [ _ msg] (:type msg)))
-
-(defmethod message-handler "GET_EVENTTYPES" get-eventtypes
-  [betfair msg]
-  (timbre/info (:type msg))
+(defn send!
+  [betfair msg type uri]
   (let [{:keys [token out-chan]} betfair
-        url (str (get-in betfair [:config :betting-api]) "listEventTypes/")
+        url (str (get-in betfair [:config :betting-api]) uri "/")
         app-key (get-in betfair [:config :app-key])
         content (c/generate-string (:body msg))
         request (merge basic-request-body {:url url
@@ -35,6 +30,20 @@
                               (timbre/error "Betfair call failed, exception is " error)
                               (if (not (= status 200))
                                 (timbre/error "Betfair status: " status)
-                                (a/put! out-chan {:type "RESP_EVENTTYPES"
+                                (a/put! out-chan {:type type
                                                   :topic "DB"
                                                   :payload (c/parse-string body true)})))))))
+
+(defmulti message-handler
+  "Message handler for db calls"
+  (fn [ _ msg] (:type msg)))
+
+(defmethod message-handler "GET_EVENTTYPES" get-eventtypes
+  [betfair msg]
+  (timbre/info (:type msg))
+  (send! betfair msg "RESP_EVENTTYPES" "listEventTypes"))
+
+(defmethod message-handler "GET_COMPETITIONS" get-competitions
+  [betfair msg]
+  (timbre/info (:type msg))
+  (send! betfair msg "RESP_COMPETITIONS" "listCompetitions"))

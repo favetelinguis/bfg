@@ -9,7 +9,7 @@
    [bfg.impl.db :refer (new-database)]
    ))
 
-;; Can be used in the repl to send in messages to the system
+;; Can be used in the repl to send in messages to the system 
 (def debug-chan (a/chan))
 
 (defn dev-system [{:keys (betfair web-server) :as config}]

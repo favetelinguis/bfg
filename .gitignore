@@ -15,3 +15,4 @@ node_modules
 configs/private.edn
 npm-debug.log
 rethinkdb_data
+*.log

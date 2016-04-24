@@ -31,13 +31,8 @@
     (let [msg (c/parse-string message true)]
       (a/put! out-chan (mw/handler msg)))))
 
-;; make into go-loop
-#_(defn send-fn [channels]
-  (fn [response]
-    (timbre/info "WS outgoing message: " response)
-    (doseq [channel @channels]
-      (async/send! channel (c/generate-string response)))
-    ))
+(defn print-error [channel throwable]
+  (timbre/error throwable))
 
 (defn start-websocket-send! [component]
   (let [kill-chan (a/chan)
@@ -64,6 +59,7 @@
     (if-not running?
       (let [websocket-callbacks {:on-open (connect-fn channels)
                                  :on-close (disconnect-fn channels)
+                                 :on-error print-error
                                  :on-message (incoming-message-fn out-chan)}
             web-routes (routes
                         (GET "/" {c :context} (redirect (str c "/index.html")))

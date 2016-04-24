@@ -4,12 +4,13 @@
    [taoensso.timbre :as timbre]
    [clojure.core.async :as a]))
 
-(defn transform-eventtypes-list
-  [{:keys [marketCount eventType]}]
-  (let [{:keys [id name]} eventType]
-    {:id id
-     :name name
-     :marketCount marketCount}))
+
+(defn replace! [conn id type data]
+  (-> (r/table "junk")
+      (r/get id)
+      (r/replace
+       {:id id :topic "WS" :type type :time (r/now) :data data})
+      (r/run conn)))
 
 (defmulti message-handler
   "Message handler for db calls"
@@ -17,10 +18,16 @@
 
 (defmethod message-handler "RESP_EVENTTYPES" resp-eventtypes [db msg]
   (timbre/info (:type msg))
-  (let [data (map transform-eventtypes-list (:payload msg))
-        db-conn (:conn db)
-        ]
-    (-> (r/table "junk")
-        (r/get 1)
-        (r/replace {:id 1 :topic "WS" :type "RESP_EVENTTYPES" :eventTypes data})
-        (r/run db-conn))))
+  (let [data (:payload msg)
+        id "eventTypes"
+        type "RESP_EVENTTYPES"
+        db-conn (:conn db)]
+    (replace! db-conn id type data)))
+
+(defmethod message-handler "RESP_COMPETITIONS" resp-competitions [db msg]
+  (timbre/info (:type msg))
+  (let [data (:payload msg)
+        id "competitions"
+        type "RESP_COMPETITIONS"
+        db-conn (:conn db)]
+    (replace! db-conn id type data)))

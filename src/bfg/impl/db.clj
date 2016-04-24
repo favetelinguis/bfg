@@ -9,18 +9,23 @@
    [com.stuartsierra.component :as component]
    [bfg.message-handlers.db-handler :as db]))
 
-(defn get-table-changes [conn out-chan]
+(defn get-table-changes [conn out-chan id]
   (let [c
         (-> (r/table "junk")
-            (r/get 1)
+            (r/get id)
             (r/changes)
-            ;; (r/map #(:new_val %))
             (r/run conn {:async? true}))]
     (go-loop []
       (when-let [msg (<! c)]
         (let [payload (get msg :new_val)]
           (a/put! out-chan payload))
         (recur)))))
+
+(defn setup-changefeeds [conn out-chan]
+  {
+   :event-types (get-table-changes conn out-chan "eventTypes")
+   :competitions (get-table-changes conn out-chan "competitions")
+   })
 
 (defn changefeed [conn out-chan]
   (let [changefeed (-> (r/table "junk")
@@ -61,8 +66,7 @@
             temp-component (assoc component
                         :running? true
                         :conn c)]
-        #_(changefeed c out-chan) ;; start a change feed for eventTypes
-        (get-table-changes c out-chan)
+        (setup-changefeeds c out-chan)
         (assoc temp-component
                :kill-fn! (start-db-handler! temp-component)))
       component

@@ -10,7 +10,7 @@
                  [http-kit "2.1.19"]
                  [http-kit.fake "0.2.1"]
                  [cheshire "5.5.0"]
-                 [com.taoensso/timbre "4.1.4"]
+                 [com.taoensso/timbre "4.3.1"]
 
                  [com.apa512/rethinkdb "0.15.12"]
                  [com.stuartsierra/component "0.3.1"]
