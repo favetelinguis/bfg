@@ -4,7 +4,8 @@ import { connect } from 'react-redux';
 import ListGroup from 'react-bootstrap/lib/ListGroup';
 import Button from 'react-bootstrap/lib/Button';
 import ListGroupItem from 'react-bootstrap/lib/ListGroupItem';
-import * as actionCreators from '../action_creators.js';
+import Griddle from 'griddle-react';
+import * as actionCreators from '../action_creators.js'; //remove autoimport and use explicit as in example on redux
 
 export const Selector1 = React.createClass({
   mixins: [PureRenderMixin],
@@ -23,11 +24,10 @@ export const Selector1 = React.createClass({
           onClick={!this.props.isLoading ? this.getEvents : null}>
           {this.props.isLoading ? 'Fetching...' : 'List Event Types'}
         </Button>
-        <ListGroup>
-          {this.props.eventTypes.map(event =>
-            <ListGroupItem key={event.getIn(['eventType', 'id'])}>{event.get('name')}</ListGroupItem>
-          )}
-        </ListGroup>
+        <Griddle results={this.props.eventTypes}
+          showFilter={true}
+          resultsPerPage={30}
+        columns={['name', 'marketCount']}/>
       </div>
     );
   }
@@ -35,7 +35,8 @@ export const Selector1 = React.createClass({
 
 function mapStateToProps(state) {
   return {
-    eventTypes: state.getIn(['listEventTypes', 'events']),
+    //Here i can order the list of number of markets?
+    eventTypes: state.getIn(['listEventTypes', 'events']).toJS(),
     isLoading: state.getIn(['listEventTypes', 'isLoading'])
   };
 }

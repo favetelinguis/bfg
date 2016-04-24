@@ -5,7 +5,7 @@ import { Route, Router, IndexRoute, hashHistory } from 'react-router';
 import { createStore, applyMiddleware } from 'redux';
 import { Provider } from 'react-redux';
 
-import socket from './websocket';
+import {socket, setupSocketEventHandlers} from './websocket';
 import reducer from './reducers/reducer';
 import remoteActionMiddleware from './remote_action_middleware';
 import App from './components/App.jsx';
@@ -24,6 +24,8 @@ const store = createStoreWithMiddleware(
   initialState, //Nice place to get state from server to set client state up to date
   window.devToolsExtension ? window.devToolsExtension() : f => f
 );
+
+setupSocketEventHandlers(store);
 
 /* socket.registerEventHandler((dispatch, payload) => {
    switch (dispatch) {

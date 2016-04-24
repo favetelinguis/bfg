@@ -9,19 +9,30 @@
    [bfg.impl.db :refer (new-database)]
    ))
 
+;; Can be used in the repl to send in messages to the system
+(def debug-chan (a/chan))
+
 (defn dev-system [{:keys (betfair web-server) :as config}]
   (let [ws-out-chan (a/chan)
         db-out-chan (a/chan)
         bf-out-chan (a/chan)
-        mh-in-chan (a/merge [ws-out-chan db-out-chan bf-out-chan] 1024)
+        master-out-chan (a/merge [ws-out-chan db-out-chan bf-out-chan debug-chan] 1024)
+        ws-in-chan (a/chan)
+        db-in-chan (a/chan)
+        bf-in-chan (a/chan)
+        pub-chan (a/pub master-out-chan :topic)
         ]
+    ;; Channel Setup
+    (a/sub pub-chan "WS" ws-in-chan)
+    (a/sub pub-chan "DB" db-in-chan)
+    (a/sub pub-chan "BF" bf-in-chan)
+    ;; System Setup
     (-> (component/system-map
-         :message-handler (new-message-handler mh-in-chan)
-         :web-server (new-web-server web-server ws-out-chan)
-         :betfair-client (bfc/new-betfair-client betfair bf-out-chan)
-         :db (new-database db-out-chan) ;;add config parameter for db
+         :web-server (new-web-server web-server ws-in-chan ws-out-chan)
+         :betfair-client (bfc/new-betfair-client betfair bf-in-chan bf-out-chan)
+         :db (new-database db-in-chan db-out-chan) ;;add config parameter for db
          )
-        (component/system-using
+        #_(component/system-using
          {
           :message-handler {:ws :web-server
                             :bf :betfair-client

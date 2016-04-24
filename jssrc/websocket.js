@@ -1,14 +1,19 @@
+import {setEventTypes} from './action_creators.js';
+
 function output(text){
   console.log(text);
 }
 
-function setupSocket() {
-  let socket;
+let createSocket = () => {
   let uri = "ws://localhost:8085";
   // let uri = "ws://" + location.host + location.pathname;
   // uri = uri.substring(0, uri.lastIndexOf('/'));
-  socket = new WebSocket(uri);
+  return new WebSocket(uri);
+};
 
+export let socket = createSocket();
+
+export function setupSocketEventHandlers(store) {
   socket.onerror = (error) => {
     output(error);
   };
@@ -24,10 +29,11 @@ function setupSocket() {
 
   socket.onmessage = (event) => {
     const action = JSON.parse(event.data);
-    // store.dispatch(action);
+    output(action);
+    switch (action.type) {
+      case "RESP_EVENTTYPES":
+      store.dispatch(setEventTypes(action));
+    }
   };
-
-  return socket;
 }
 
-export default setupSocket();

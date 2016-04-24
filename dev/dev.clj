@@ -10,9 +10,10 @@
    [criterium.core :as c :refer (bench)]
    [schema.test :as st]
    [schema.core :as s :refer (validate explain with-fn-validation)]
-   [clojure.pprint :refer (pprint)]
    [clojure.test :as test]
-   [bfg.assembly :refer (dev-system)]
+   [clojure.pprint :refer (pprint)]
+   [clojure.core.async :as a :refer (put!)]
+   [bfg.assembly :refer (dev-system debug-chan)]
    ))
 
 ;;HELPER FNS

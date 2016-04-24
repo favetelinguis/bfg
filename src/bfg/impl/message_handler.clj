@@ -4,10 +4,12 @@
    [taoensso.timbre :as timbre]
    [com.stuartsierra.component :as component]
    [bfg.message-handlers.mh-handler :as mh]
-   [clojure.core.async :as a]))
+   [clojure.core.async :as a]
+   ))
 
 (defn start-message-handler! [in-chan component]
-  (let [kill-chan (a/chan)]
+  (let [kill-chan (a/chan)
+        in-chan (:in-chan component)]
     (a/go-loop []
       (let [[msg ch] (a/alts! [kill-chan in-chan])]
         (when-not (= ch kill-chan)
@@ -23,7 +25,7 @@
   (start [component]
     (timbre/info "Starting Message handler")
     (if-not running?
-      (let [stop-mh! (start-message-handler! in-ch component)]
+      (let [stop-mh! (start-message-handler! component)]
         (assoc component
                :running? true
                :kill-fn! stop-mh!))
@@ -37,7 +39,8 @@
         (assoc component
                :running? false
                :kill-fn! nil))
-      component)))
+      component))
+  )
 
 (defn new-message-handler [in-ch]
   (map->MessageHandler {:in-ch in-ch}))

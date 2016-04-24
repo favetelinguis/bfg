@@ -12,11 +12,8 @@
    [taoensso.timbre :as timbre]
    [com.stuartsierra.component :as component]
    [clojure.core.async :as a :refer (<! go-loop)]
-
-   [bfg.message-handlers.ws-handler :as mh]
+   [bfg.middleware.ws :as mw]
    ))
-
-#_(defonce channels (atom #{}))
 
 (defn connect-fn [channels]
   (fn [channel]
@@ -32,49 +29,68 @@
   (fn [channel message]
     (timbre/info "WS incoming message: " message)
     (let [msg (c/parse-string message true)]
-      (a/put! out-chan msg))))
+      (a/put! out-chan (mw/handler msg)))))
 
-(defn send-fn [channels]
+;; make into go-loop
+#_(defn send-fn [channels]
   (fn [response]
     (timbre/info "WS outgoing message: " response)
     (doseq [channel @channels]
-      (async/send! channel (c/generate-string response)))))
+      (async/send! channel (c/generate-string response)))
+    ))
 
-#_(def websocket-callbacks
-   {:on-open (connect-fn channels)
-    :on-close (disconnect-fn channels)
-    :on-message incoming-message!})
+(defn start-websocket-send! [component]
+  (let [kill-chan (a/chan)
+        in-chan (:in-chan component)
+        channels (:channels component)]
+    (a/go-loop []
+      (let [[msg ch] (a/alts! [kill-chan in-chan])]
+        (when-not (= ch kill-chan)
+          (do
+            (timbre/info "SENDING TO CLIENT: " (:type msg))
+            (doseq [channel @channels]
+              (try
+                (async/send! channel (c/generate-string (mw/handler msg)))
+                (catch Exception e
+                  (timbre/error "WS send error: " e))))
+            (recur)))))
+    (fn stop! []
+      (a/put! kill-chan :stop))))
 
-#_(routes
-  (GET "/" {c :context} (redirect (str c "/index.html")))
-  (route/resources "/"))
-
-(defrecord WebServer [options server channels out-chan send!]
+(defrecord WebServer [options running? server channels in-chan out-chan kill-fn!]
   component/Lifecycle
   (start [component]
     (timbre/info "Starting web-server at port: " (get options :port))
-    (let [websocket-callbacks {:on-open (connect-fn channels)
-                               :on-close (disconnect-fn channels)
-                               :on-message (incoming-message-fn out-chan)}
-          web-routes (routes
-                      (GET "/" {c :context} (redirect (str c "/index.html")))
-                      (route/resources "/"))
-          server (web/run (-> web-routes
-                              (web-middleware/wrap-session {:timeout 20})
-                              (web-middleware/wrap-websocket websocket-callbacks))
-                   options)]
-      (assoc component
-             :server server
-             :send! (send-fn channels))))
+    (if-not running?
+      (let [websocket-callbacks {:on-open (connect-fn channels)
+                                 :on-close (disconnect-fn channels)
+                                 :on-message (incoming-message-fn out-chan)}
+            web-routes (routes
+                        (GET "/" {c :context} (redirect (str c "/index.html")))
+                        (route/resources "/"))
+            server (web/run (-> web-routes
+                                (web-middleware/wrap-session {:timeout 20})
+                                (web-middleware/wrap-websocket websocket-callbacks))
+                     options)]
+        (assoc component
+               :server server
+               :kill-fn! (start-websocket-send! component)))
+      component))
+
   (stop [component]
     (timbre/info "Stopping web-server")
-    (when server
-      (web/stop server)
+    (if running?
+      (do
+        (kill-fn!)
+        (assoc component
+               :running? false
+               :kill-fn! nil))
       component)))
 
 (defn new-web-server
-  ([options out-chan]
+  ([options in-chan out-chan]
    (map->WebServer {:options {:host (or (get options :host) "0.0.0.0")
                               :port (or (get options :port) 0)}
                     :out-chan out-chan
+                    :in-chan in-chan
                     :channels (atom #{})})))

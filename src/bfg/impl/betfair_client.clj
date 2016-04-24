@@ -1,6 +1,6 @@
 (ns bfg.impl.betfair-client
   (:require
-   [bfg.betfair.api :as bf]
+   [bfg.message-handlers.bf-handler :as bf]
    [bfg.protocol :refer (trade-manager-dispatch-values
                                  betfair-client-dispatch-values BetfairClientMsg)]
    [taoensso.timbre :as timbre]
@@ -122,8 +122,24 @@
              (a/>! market-book-feed))))
         (recur)))))
 
+(defn start-betfair-client! [component]
+  (let [kill-chan (a/chan)
+        in-chan (:in-chan component)]
+    (a/go-loop []
+      (let [[msg ch] (a/alts! [kill-chan in-chan])]
+        (when-not (= ch kill-chan)
+          (do
+            (timbre/info (:type msg))
+            (try
+              (bf/message-handler component msg)
+              (catch Exception e
+                (timbre/error "BF error: " e)))
+            (recur)))))
+    (fn stop! []
+      (a/put! kill-chan :stop))))
+
 (defrecord Betfair-client
-    [config running? token kill-keep-alive out-chan]
+    [config running? token kill-keep-alive kill-client! in-chan out-chan]
   component/Lifecycle
   (start [component]
     (timbre/info "Starting betfair client")
@@ -143,11 +159,12 @@
                                                       (:body login-response) true)]
             (if-not (= status "SUCCESS")
               (throw (Exception. (str "Login failed: " status "error:" error)))
-              (do
-                ;; (start-api betfair-request betfair-response market-book-feed token config)
-                (assoc component
-                       :running? true
-                       :token token
+              (let [c (assoc component
+                           :running? true
+                           :token token)
+                    kill! (start-betfair-client! c)]
+                (assoc c
+                       :kill-client! kill!
                        :kill-keep-alive (start-keep-alive
                                          keep-alive-url token
                                          app-key keep-alive-period)))))))
@@ -158,22 +175,17 @@
       (let [logout-url (get-in config [:logout-url])
             app-key (get config :app-key)
             logout-response @(logout-from-betfair logout-url token app-key)
-            http-code (:status logout-response)]
-        (if-not (= http-code 200)
-          (throw (Exception. (str "Connection failed: " logout-response)))
-          (let [{:keys (token product status error)} (c/parse-string
-                                                      (:body logout-response) true)]
-            (if-not (= status "SUCCESS")
-              (throw (Exception. (str "Logout failed:" status "error:" error)))
-              (do
-                ;; (a/close! betfair-response)
-                ;; (a/close! market-book-feed)
-                (assoc component
-                       :running? false
-                       :token nil
-                       :kill-keep-alive (kill-keep-alive)))))))
+            ]
+        (kill-keep-alive)
+        (kill-client!)
+        (assoc component
+               :running? false
+               :token nil
+               :kill-client! nil
+               :kill-keep-alive nil))
       component)))
 
-(defn new-betfair-client [config out-chan]
+(defn new-betfair-client [config in-chan out-chan]
   (map->Betfair-client {:config config
+                        :in-chan in-chan
                         :out-chan out-chan}))

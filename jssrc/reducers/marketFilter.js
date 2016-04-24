@@ -11,16 +11,15 @@ function updateIsLoading(state) {
 }
 
 const initialState = fromJS({
-  events: [],
-  isLoading: false
+  filter: {}
 });
 
 //SHOULD also have ERROR_EVENTTYPES
-export default function listEventTypes(state = initialState, action) {
+export default function marketFilter(state = initialState, action) {
   switch (action.type) {
-  case 'RESP_EVENTTYPES':
+  case 'SET':
     return setState(state, action.eventTypes);
-  case 'GET_EVENTTYPES':
+  case 'GET':
     return updateIsLoading(state);
   default:
     return state;

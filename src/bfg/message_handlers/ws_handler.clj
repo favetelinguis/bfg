@@ -1,10 +1,14 @@
 (ns bfg.message-handlers.ws-handler
-  (:require [bfg.betfair.api :as bf]))
+  (:require
+   [taoensso.timbre :as timbre]
+   ))
 
 (defmulti message-handler
-  "Message handler for ws calls"
-  (fn [{:keys [dispatch]} _] (first dispatch)))
+  "Message handler for db calls"
+  (fn [ _ msg] (:type msg)))
 
-(defmethod message-handler :betfair call-betfair [message betfair]
-  (let [updated-message (update message :dispatch rest)]
-    (bf/message-handler updated-message betfair)))
+(defmethod message-handler "GET_EVENTTYPES" resp-eventtypes [db msg]
+  (timbre/info (:type msg)))
+
+(defmethod message-handler "RESP_EVENTTYPES" resp-eventtypes [db msg]
+  (timbre/info (:type msg)))
