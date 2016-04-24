@@ -8,8 +8,8 @@ import Panel from 'react-bootstrap/lib/Panel';
 const menu = (
   <ButtonGroup>
     <Button><NavLink to="/" onlyActiveOnIndex>Home</NavLink></Button>
-    <Button><NavLink to="selector1">Selector1</NavLink></Button>
-    <Button><NavLink to="selector2">Selector2</NavLink></Button>
+    <Button><NavLink to="eventTypes">Event Types</NavLink></Button>
+    <Button><NavLink to="competitions">Competitions</NavLink></Button>
   </ButtonGroup>
 );
 

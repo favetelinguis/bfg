@@ -4,19 +4,17 @@ import ReactDOM from 'react-dom';
 import { Route, Router, IndexRoute, hashHistory } from 'react-router';
 import { createStore, applyMiddleware } from 'redux';
 import { Provider } from 'react-redux';
+import thunk from 'redux-thunk';
 
-import {socket, setupSocketEventHandlers} from './websocket';
+import { setupSocketEventHandlers } from './websocket';
 import reducer from './reducers/reducer';
-import remoteActionMiddleware from './remote_action_middleware';
 import App from './components/App.jsx';
 import InitSelector from './components/InitSelector.jsx';
-import { Selector1Container } from './components/Selector1.jsx';
-import Selector2 from './components/Selector2.jsx';
+import EventTypes from './containers/EventTypes';
+import Competitions from './containers/Competitions.jsx';
 
-/* import '../resources/style.css';
- */
 const createStoreWithMiddleware = applyMiddleware(
-  remoteActionMiddleware(socket)
+  thunk
 )(createStore);
 const initialState = Map();
 const store = createStoreWithMiddleware(
@@ -27,21 +25,11 @@ const store = createStoreWithMiddleware(
 
 setupSocketEventHandlers(store);
 
-/* socket.registerEventHandler((dispatch, payload) => {
-   switch (dispatch) {
-   case 'action':
-   store.dispatch(payload);
-   break;
-   default:
-   console.warn(dispatch, payload);
-   }
-   });
- */
 const routes = (
   <Route path="/" component={ App }>
     <IndexRoute component={ InitSelector } />
-    <Route path="selector1" component={ Selector1Container } />
-    <Route path="selector2" component={ Selector2 } />
+    <Route path="eventTypes" component={ EventTypes } />
+    <Route path="competitions" component={ Competitions } />
   </Route>
   );
 

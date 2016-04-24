@@ -1,4 +1,7 @@
-import {setEventTypes} from './action_creators.js';
+import { setEventTypes } from './actions/eventTypes';
+import { setCompetitions } from './actions/competitions';
+import { RESP_EVENTTYPES } from './constants/eventTypes';
+import { RESP_COMPETITIONS } from './constants/competitions';
 
 function output(text){
   console.log(text);
@@ -13,6 +16,10 @@ let createSocket = () => {
 
 export let socket = createSocket();
 
+export function send(msg) {
+  const json = JSON.stringify(msg);
+  socket.send(json);
+}
 export function setupSocketEventHandlers(store) {
   socket.onerror = (error) => {
     output(error);
@@ -31,8 +38,12 @@ export function setupSocketEventHandlers(store) {
     const action = JSON.parse(event.data);
     output(action);
     switch (action.type) {
-      case "RESP_EVENTTYPES":
+    case RESP_EVENTTYPES:
       store.dispatch(setEventTypes(action));
+      break;
+    case RESP_COMPETITIONS:
+      store.dispatch(setCompetitions(action));
+      break;
     }
   };
 }
