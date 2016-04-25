@@ -1,19 +1,20 @@
 import { connect } from 'react-redux';
-import { getCompetitions, getIsLoading } from '../reducers/competitions';
-import { serverCompetitions } from  '../actions/competitions';
+import { getCompetitions, getIsLoading, getError } from '../reducers/competitions';
+import { requestCompetitions } from '../actions/competitions';
 import Competitions from '../components/Competitions.jsx';
 
 const mapStateToProps = (state) => {
   return {
     competitions: getCompetitions(state.get('competitions')).toJS(),
-    isLoading: getIsLoading(state.get('competitions'))
+    isLoading: getIsLoading(state.get('competitions')),
+    error: getError(state.get('competitions'))
   }
 };
 
 const mapDispatchToProps = (dispatch) => {
   return {
     onGetCompetitionsClick: () => {
-      dispatch(serverCompetitions());
+      dispatch(requestCompetitions());
     }
   }
 };

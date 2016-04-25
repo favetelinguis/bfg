@@ -7,6 +7,7 @@ const Competitions = React.createClass({
 
   propTypes: {
     isLoading: PropTypes.bool.isRequired,
+    error: PropTypes.bool.isRequired,
     competitions: PropTypes.array.isRequired,
     onGetCompetitionsClick: PropTypes.func.isRequired
   },
@@ -23,11 +24,13 @@ const Competitions = React.createClass({
         >
           {this.props.isLoading ? 'Fetching...' : 'List Competitions'}
         </Button>
-        <Griddle results={this.props.competitions}
-          showFilter={true}
-          resultsPerPage={30}
-          columns={['name', 'competitionRegion', 'marketCount']}
-        />
+        {this.props.error ? 'Timed out while fetching!' :
+          <Griddle results={this.props.competitions}
+            showFilter={true}
+            resultsPerPage={30}
+            columns={['name', 'competitionRegion', 'marketCount']}
+          />
+        }
       </div>
     );
   }

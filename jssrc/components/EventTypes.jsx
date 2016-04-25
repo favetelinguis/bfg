@@ -7,6 +7,7 @@ const EventTypes = React.createClass({
 
   propTypes: {
     isLoading: PropTypes.bool.isRequired,
+    error: PropTypes.bool.isRequired,
     eventTypes: PropTypes.array.isRequired,
     onGetEventTypesClick: PropTypes.func.isRequired
   },
@@ -23,11 +24,13 @@ const EventTypes = React.createClass({
         >
           {this.props.isLoading ? 'Fetching...' : 'List Event Types'}
         </Button>
-        <Griddle results={this.props.eventTypes}
-          showFilter={true}
-          resultsPerPage={30}
-          columns={['name', 'marketCount']}
-        />
+        {this.props.error ? 'Timed out while fetching!' :
+          <Griddle results={this.props.eventTypes}
+            showFilter={true}
+            resultsPerPage={30}
+            columns={['name', 'marketCount']}
+          />
+        }
       </div>
     );
   }

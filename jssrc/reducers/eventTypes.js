@@ -1,28 +1,50 @@
 import { List, Map, fromJS } from 'immutable';
-import { RESP_EVENTTYPES, TOGGLE_IS_LOADING_EVENTTYPES } from '../constants/eventTypes';
+import { RESP_EVENTTYPES,
+         SET_TIMEOUT_ID_EVENTTYPES,
+         CLEAR_TIMEOUT_ID_EVENTTYPES,
+         TOGGLE_ERROR_EVENTTYPES,
+         TOGGLE_IS_LOADING_EVENTTYPES } from '../constants/eventTypes';
 
-function toggleIsLoading(state) {
-  return state.update('isLoading', d => !d);
+function setTimeoutId(state, id) {
+  return state.set('timeoutId', id);
 }
 
-function setState(state, newState) {
-  const newList = fromJS(newState);
-  const temp = toggleIsLoading(state);
-  return temp.set('events', newList);
+function clearTimeoutId(state) {
+  return state.set('timeoutId', null);
+}
+
+function toggleIsLoading(state) {
+  return state.update('isLoading', b => !b);
+}
+
+function setState(state, events) {
+  const newList = fromJS(events);
+  return state.set('events', newList);
+}
+
+function toggleError(state) {
+  return state.update('error', b => !b);
 }
 
 const initialState = fromJS({
   events: [],
-  isLoading: false
+  isLoading: false,
+  error: false,
+  timeoutId: null
 });
 
-//SHOULD also have ERROR_EVENTTYPES
 export function eventTypes(state = initialState, action) {
   switch (action.type) {
   case RESP_EVENTTYPES:
     return setState(state, action.eventTypes);
+  case SET_TIMEOUT_ID_EVENTTYPES:
+    return setTimeoutId(state, action.timeoutId);
+  case CLEAR_TIMEOUT_ID_EVENTTYPES:
+    return clearTimeoutId(state);
   case TOGGLE_IS_LOADING_EVENTTYPES:
     return toggleIsLoading(state);
+  case TOGGLE_ERROR_EVENTTYPES:
+    return toggleError(state);
   default:
     return state;
   }
@@ -30,6 +52,14 @@ export function eventTypes(state = initialState, action) {
 
 export function getEventTypes(state) {
   return state.get('events');
+};
+
+export function getTimeoutId(state) {
+  return state.get('timeoutId');
+};
+
+export function getError(state) {
+  return state.get('error');
 };
 
 export function getIsLoading(state) {

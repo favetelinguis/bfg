@@ -11,7 +11,7 @@ import reducer from './reducers/reducer';
 import App from './components/App.jsx';
 import InitSelector from './components/InitSelector.jsx';
 import EventTypes from './containers/EventTypes';
-import Competitions from './containers/Competitions.jsx';
+import Competitions from './containers/Competitions';
 
 const createStoreWithMiddleware = applyMiddleware(
   thunk

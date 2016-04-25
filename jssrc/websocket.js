@@ -1,5 +1,5 @@
-import { setEventTypes } from './actions/eventTypes';
-import { setCompetitions } from './actions/competitions';
+import { responseEventTypes } from './actions/eventTypes';
+import { responseCompetitions } from './actions/competitions';
 import { RESP_EVENTTYPES } from './constants/eventTypes';
 import { RESP_COMPETITIONS } from './constants/competitions';
 
@@ -39,10 +39,10 @@ export function setupSocketEventHandlers(store) {
     output(action);
     switch (action.type) {
     case RESP_EVENTTYPES:
-      store.dispatch(setEventTypes(action));
+      store.dispatch(responseEventTypes(action));
       break;
     case RESP_COMPETITIONS:
-      store.dispatch(setCompetitions(action));
+      store.dispatch(responseCompetitions(action));
       break;
     }
   };
