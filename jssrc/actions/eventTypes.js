@@ -59,7 +59,7 @@ export const requestEventTypes = () => {
 export const responseEventTypes = (action) => {
   return (dispatch, getState) => {
     // Prop extremly slow to do toJS on the whole structure use immutablejs better!!
-    const { eventTypes } = getState().toJS();
+    const eventTypes = getState().get('eventTypes').toJS();
     if (eventTypes.timeoutId) {
       window.clearTimeout(eventTypes.timeoutId);
       dispatch(setEventTypes(action.eventTypes));

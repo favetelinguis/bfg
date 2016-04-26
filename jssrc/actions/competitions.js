@@ -58,9 +58,7 @@ export const requestCompetitions = () => {
 
 export const responseCompetitions = (action) => {
   return (dispatch, getState) => {
-    // Prop extremly slow to do toJS on the whole structure use immutablejs better!!
-    // change to get in like in reducers
-    const { competitions } = getState().toJS();
+    const competitions = getState().get('competitions').toJS();
     if (competitions.timeoutId) {
       window.clearTimeout(competitions.timeoutId);
       dispatch(setCompetitions(action.competitions));

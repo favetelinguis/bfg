@@ -3,13 +3,15 @@ import PureRenderMixin from 'react-addons-pure-render-mixin';
 import Button from 'react-bootstrap/lib/Button';
 import Griddle from 'griddle-react';
 
-const Competitions = React.createClass({
+const FilterSelector = React.createClass({
 
   propTypes: {
     isLoading: PropTypes.bool.isRequired,
     error: PropTypes.bool.isRequired,
-    competitions: PropTypes.array.isRequired,
-    onGetCompetitionsClick: PropTypes.func.isRequired
+    types: PropTypes.array.isRequired,
+    message: PropTypes.string.isRequired,
+    cols: PropTypes.array.isRequired,
+    onClick: PropTypes.func.isRequired
   },
 
   mixins: [PureRenderMixin],
@@ -20,15 +22,15 @@ const Competitions = React.createClass({
         <Button
           bsStyle="primary"
           disabled={this.props.isLoading}
-          onClick={!this.props.isLoading ? this.props.onGetCompetitionsClick : null}
+          onClick={!this.props.isLoading ? this.props.onClick : null}
         >
-          {this.props.isLoading ? 'Fetching...' : 'List Competitions'}
+          {this.props.isLoading ? 'Fetching...' : 'List ' + this.props.message }
         </Button>
         {this.props.error ? 'Timed out while fetching!' :
-          <Griddle results={this.props.competitions}
+          <Griddle results={this.props.types}
             showFilter={true}
             resultsPerPage={30}
-            columns={['name', 'competitionRegion', 'marketCount']}
+            columns={ this.props.cols }
           />
         }
       </div>
@@ -36,4 +38,4 @@ const Competitions = React.createClass({
   }
 });
 
-export default Competitions;
+export default FilterSelector;
