@@ -1,7 +1,8 @@
 // Renders all the markup that is common from all the components
 import React from 'react';
-import Filter from './Filter.jsx';
-import Market from './Market.jsx';
+import PureRenderMixin from 'react-addons-pure-render-mixin';
+import MarketFilter from '../containers/MarketFilter';
+import Market from './Markets.jsx';
 import Header from './Header.jsx';
 import Selectors from './Selectors.jsx';
 import Grid from 'react-bootstrap/lib/Grid';
@@ -9,6 +10,8 @@ import Col from 'react-bootstrap/lib/Col';
 import Row from 'react-bootstrap/lib/Row';
 
 export default React.createClass({
+  mixins: [PureRenderMixin],
+
   render() {
     return (
       <Grid>
@@ -29,7 +32,7 @@ export default React.createClass({
         </Row>
         <Row>
           <Col xs={12}>
-            <Filter />
+            <MarketFilter />
           </Col>
         </Row>
       </Grid>

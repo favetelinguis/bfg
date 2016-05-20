@@ -11,7 +11,8 @@ const FilterSelector = React.createClass({
     types: PropTypes.array.isRequired,
     message: PropTypes.string.isRequired,
     cols: PropTypes.array.isRequired,
-    onClick: PropTypes.func.isRequired
+    onClick: PropTypes.func.isRequired,
+    onRowClick: PropTypes.func.isRequired
   },
 
   mixins: [PureRenderMixin],
@@ -31,6 +32,7 @@ const FilterSelector = React.createClass({
             showFilter={true}
             resultsPerPage={30}
             columns={ this.props.cols }
+            onRowClick={ this.props.onRowClick }
           />
         }
       </div>

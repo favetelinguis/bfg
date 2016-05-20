@@ -1,4 +1,5 @@
 import { List, Map, fromJS } from 'immutable';
+import { update } from 'react-addons-update';
 import { RESP_EVENTTYPES,
          SET_TIMEOUT_ID_EVENTTYPES,
          CLEAR_TIMEOUT_ID_EVENTTYPES,

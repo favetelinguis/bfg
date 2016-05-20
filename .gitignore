@@ -16,3 +16,4 @@ configs/private.edn
 npm-debug.log
 rethinkdb_data
 *.log
+/resources/public

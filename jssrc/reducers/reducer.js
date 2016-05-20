@@ -7,7 +7,7 @@ import marketTypes from './marketTypes';
 import { competitions } from './competitions';
 import timeRanges from './timeRanges';
 import events from './events';
-import marketFilter from './marketFilter';
+import { marketFilter } from './marketFilter';
 
 export default combineReducers({
   eventTypes,
@@ -17,5 +17,5 @@ export default combineReducers({
   competitions,
   timeRanges,
   events,
-  marketFilter
+  marketFilter: marketFilter('marketFilter')
 });

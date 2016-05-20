@@ -1,41 +1,16 @@
 import { send } from '../websocket';
+import { makeActionCreator } from '../util/actions';
 import { RESP_COMPETITIONS,
          SET_TIMEOUT_ID_COMPETITIONS,
          CLEAR_TIMEOUT_ID_COMPETITIONS,
          TOGGLE_ERROR_COMPETITIONS,
          TOGGLE_IS_LOADING_COMPETITIONS } from '../constants/competitions';
 
-export const toggleIsLoadingCompetitions = () => {
-  return {
-    type: TOGGLE_IS_LOADING_COMPETITIONS
-  };
-};
-
-export const toggleErrorCompetitions = () => {
-  return {
-    type: TOGGLE_ERROR_COMPETITIONS
-  };
-};
-
-export const clearTimeoutIdCompetitions = () => {
-  return {
-    type: CLEAR_TIMEOUT_ID_COMPETITIONS
-  };
-};
-
-export const setCompetitions = (competitions) => {
-  return {
-    type: RESP_COMPETITIONS,
-    competitions: competitions
-  };
-};
-
-export const setTimeoutIdCompetitions = (id) => {
-  return {
-    type: SET_TIMEOUT_ID_COMPETITIONS,
-    timeoutId: id
-  };
-};
+export const toggleIsLoadingCompetitions = makeActionCreator(TOGGLE_IS_LOADING_COMPETITIONS);
+export const toggleErrorCompetitions = makeActionCreator(TOGGLE_ERROR_COMPETITIONS);
+export const clearTimeoutIdCompetitions = makeActionCreator(CLEAR_TIMEOUT_ID_COMPETITIONS);
+export const setCompetitions = makeActionCreator(RESP_COMPETITIONS, 'competitions');
+export const setTimeoutIdCompetitions = makeActionCreator(SET_TIMEOUT_ID_COMPETITIONS, 'timeoutId');
 
 export const requestCompetitions = () => {
   return (dispatch, getState) => {

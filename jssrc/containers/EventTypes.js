@@ -2,6 +2,7 @@ import { connect } from 'react-redux';
 import { getEventTypes, getIsLoading, getError } from '../reducers/eventTypes';
 import { requestEventTypes } from  '../actions/eventTypes';
 import FilterSelector from '../components/FilterSelector.jsx';
+import { actions } from 'react-redux-form';
 
 const mapStateToProps = (state) => {
   return {
@@ -17,7 +18,10 @@ const mapDispatchToProps = (dispatch) => {
   return {
     onClick: () => {
       dispatch(requestEventTypes());
-    }
+    },
+    onRowClick: (row, event) => {
+      dispatch(actions.push('marketFilter.eventTypes', row.props.data.id));
+    } 
   }
 };
 

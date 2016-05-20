@@ -1,0 +1,43 @@
+| Backlog                   | Analysing | Doing                   | Done |
+|                           |           | [[Request Marketcatalogue]] |      |
+| [[Request Market Book]]       |           |                         |      |
+| [[Execute Manual Trade]]      |           |                         |      |
+| [[Execute Automatic Trades]]  |           |                         |      |
+| [[Backtesting and Analytics]] |           |                         |      |
+
+* TODO [#A] Request Marketcatalogue [0/4]                     :BACKLOG:STORY:
+DEADLINE: <2016-06-30 Thu>
+:PROPERTIES:
+:Effort:   200
+:END:
+- [-] Implement 7x API calls for market filter
+  - [X] listEventTypes
+  - [X] listCompetitions
+  - [ ] listTimeRanges
+  - [ ] listEvents
+  - [ ] listMarketTypes
+  - [ ] listCountries
+  - [ ] listVenues
+- [ ] Make market filter into a dynamic form 
+- [ ] [[Make an async request/response protocol for websockets]]
+- [ ] API request to listMarketCatalogue
+* TODO [#A] Request Market Book [0/1]                         :BACKLOG:STORY:
+DEADLINE: <2016-07-10 Sun>
+:PROPERTIES:
+:Effort:   50
+:END:
+- [ ] 
+* TODO [#A] Execute Manual Trade [0/1]                        :BACKLOG:STORY:
+DEADLINE: <2016-07-31 Sun>
+- [ ] 
+* TODO [#A] Execute Automatic Trades [0/1]                    :BACKLOG:STORY:
+DEADLINE: <2016-08-13 Sat>
+- [ ] 
+* TODO [#A] Backtesting and Analytics [0/1]                   :BACKLOG:STORY:
+DEADLINE: <2016-09-10 Sat>
+- [ ]
+* Task explanations
+**  <<Make an async request/response protocol for websockets>>
+Check [[http://google.com][Google]] for avaliable docs! Also more info in [[file:tasks.org:: Request Response protocol][this]] file.
+* Org HELP
+** # C-c ]/[ remove/add file from agenda list Shift-TAB toggle the whole structure

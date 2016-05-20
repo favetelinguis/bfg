@@ -8,7 +8,7 @@ const mapStateToProps = (state) => {
     types: getCompetitions(state.get('competitions')).toJS(),
     isLoading: getIsLoading(state.get('competitions')),
     error: getError(state.get('competitions')),
-    message: 'Event Types',
+    message: 'Competitions',
     cols: ['name', 'competitionRegion', 'marketCount']
   }
 };
@@ -20,6 +20,7 @@ const mapDispatchToProps = (dispatch) => {
     }
   }
 };
+
 
 const CompetitionsContainer = connect(mapStateToProps, mapDispatchToProps)(FilterSelector);
 

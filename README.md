@@ -3,6 +3,7 @@
 [![Build Status](https://travis-ci.org/favetelinguis/bfg.svg?branch=master)](https://travis-ci.org/favetelinguis/bfg) [![Built with Spacemacs](https://cdn.rawgit.com/syl20bnr/spacemacs/442d025779da2f62fc86c2082703697714db6514/assets/spacemacs-badge.svg)](http://github.com/syl20bnr/spacemacs)
 
 A Clojure library designed to ... well, that part is up to you.
+To see roadmap and progress check out backlog.org
 
 ## Usage
 
@@ -24,7 +25,7 @@ lein test
 npm run build
 
 ###Start dev server of frontend code
-npm start (localhost:8080)
+npm start (localhost:8084)
 
 ###Run frontend tests
 npm run test
